@@ -116,8 +116,7 @@ public class GameManager : MonoBehaviour {
 
     bool checkValidMove(int row, int col, int side, int opSide)
     {
-        Debug.Log("state - 1 = " + boardState[row, col - 1]);
-        Debug.Log("state - 2 = " + boardState[row,col-2]);
+        
         bool valid = false;
 
         Debug.Log(pieceArray[row, col - 1]);
@@ -126,7 +125,7 @@ public class GameManager : MonoBehaviour {
 
         if (boardState[row, col - 1] == opSide && col > 1) // Left --------------------------------------
         {
-            Debug.Log("valid");
+            Debug.Log("valid: left");
             
             for (int a = 1; a <= col; a++)
             {
@@ -155,7 +154,7 @@ public class GameManager : MonoBehaviour {
 
         if (boardState[row, col + 1] == opSide && col < 6) // Right --------------------------------------
         {
-            Debug.Log("valid");
+            Debug.Log("valid: right");
 
             for (int a = 1; a <= 7 - col; a++)
             {
@@ -184,7 +183,7 @@ public class GameManager : MonoBehaviour {
 
         if (boardState[row + 1, col] == opSide && row < 6) // Down --------------------------------------
         {
-            Debug.Log("valid");
+            Debug.Log("valid down");
 
             for (int a = 1; a <= 7 - row; a++)
             {
@@ -211,9 +210,9 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        if (boardState[row - 1, col] == opSide && row < 6) // Up --------------------------------------
+        if (boardState[row - 1, col] == opSide && row > 1) // Up --------------------------------------
         {
-            Debug.Log("valid");
+            Debug.Log("valid up");
 
             for (int a = 1; a <= row; a++)
             {
@@ -240,9 +239,9 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        if (boardState[row + 1, col - 1] == opSide && row < 6) // bottom left --------------------------------------
+        if (boardState[row + 1, col - 1] == opSide && row < 6 && col > 1) // bottom left --------------------------------------
         {
-            Debug.Log("valid");
+            Debug.Log("valid bottom left");
             march = marchLength(row, col, 0);
             for (int a = 1; a <= march; a++)
             {
@@ -269,9 +268,9 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        if (boardState[row + 1, col + 1] == opSide && row < 6) // bottom Right --------------------------------------
+        if (boardState[row + 1, col + 1] == opSide && row < 6 && col < 6) // bottom Right --------------------------------------
         {
-            Debug.Log("valid");
+            Debug.Log("valid bottom right");
             march = marchLength(row, col, 1);
             for (int a = 1; a <= march; a++)
             {
@@ -298,9 +297,9 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        if (boardState[row - 1, col - 1] == opSide && row < 6) // Top Left --------------------------------------
+        if (boardState[row - 1, col - 1] == opSide && row > 1 && col > 1) // Top Left --------------------------------------
         {
-            Debug.Log("valid");
+            Debug.Log("valid top left");
             march = marchLength(row, col, 2);
             for (int a = 1; a <= march; a++)
             {
@@ -327,9 +326,9 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        if (boardState[row - 1, col + 1] == opSide && row < 6) // Top Right --------------------------------------
+        if (boardState[row - 1, col + 1] == opSide && row > 1 && col < 6) // Top Right --------------------------------------
         {
-            Debug.Log("valid");
+            Debug.Log("valid top right");
             march = marchLength(row, col, 3);
             for (int a = 1; a <= march; a++)
             {
