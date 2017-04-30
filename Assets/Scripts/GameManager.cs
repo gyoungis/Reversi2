@@ -8,8 +8,8 @@ public class GameManager : MonoBehaviour {
     public GameObject[,] pieceArray = new GameObject[8, 8];
     public GameObject piece;
 
-    private int playerSide;
-    private int oppositeSide;
+    private int playerSide = 1;
+    private int oppositeSide = 2;
 
     private int playerScore = 2;
     private int oppositeScore = 2;
@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour {
     void Start () {
         piece = GetComponent<GameObject>();
         affectedPieces = new List<GameObject>();
+
 
 
         boardState = new int[8, 8]{ { 0, 0, 0, 0, 0, 0, 0, 0},
@@ -37,25 +38,26 @@ public class GameManager : MonoBehaviour {
             for (int x = 0; x < 8; x++)
             {
 
-                pieceArray[x, 7 - y] = pieceList[(7 - x) * 7 + y];
+                pieceArray[x, y] = pieceList[x * 8 + y];
 
             }
         }
-        // Set initial White pieces
+        
+        // Initial Black
         pieceArray[3, 3].transform.position = new Vector3(3.5f, 10, 3.5f);
         pieceArray[3, 3].GetComponent<Rigidbody>().useGravity = true;
         pieceArray[4, 4].transform.position = new Vector3(4.5f, 10, 4.5f);
         pieceArray[4, 4].GetComponent<Rigidbody>().useGravity = true;
 
-        // Set initial Black pieces
+        // Intial White
         pieceArray[3, 4].transform.position = new Vector3(3.5f, 10, 4.5f);
         pieceArray[3, 4].transform.Rotate(180, 0, 0);
         pieceArray[3, 4].GetComponent<Rigidbody>().useGravity = true;
         pieceArray[4, 3].transform.position = new Vector3(4.5f, 10, 3.5f);
         pieceArray[4, 3].transform.Rotate(180, 0, 0);
         pieceArray[4, 3].GetComponent<Rigidbody>().useGravity = true;
-        playerSide = 1;
-        oppositeSide = 2;
+        //playerSide = 1;
+        //oppositeSide = 2;
     }
 	
 	// Update is called once per frame
@@ -94,6 +96,18 @@ public class GameManager : MonoBehaviour {
                             pieceArray[row, col].GetComponent<Rigidbody>().useGravity = true;
                             playerSide = 2;
                             oppositeSide = 1;
+                            for (int x = 0; x < 8; x++)
+                            {
+                                string s = "";
+                                for (int y = 0; y < 8; y++)
+                                {
+                                    s += boardState[x, y];
+                                    if (y == 7)
+                                    {
+                                        Debug.Log(s);
+                                    }
+                                }
+                            }
                         }
                     }
                     else
@@ -106,8 +120,21 @@ public class GameManager : MonoBehaviour {
                             pieceArray[row, col].GetComponent<Rigidbody>().useGravity = true;
                             playerSide = 1;
                             oppositeSide = 2;
+                            for (int x = 0; x < 8; x++)
+                            {
+                                string s = "";
+                                for (int y = 0; y < 8; y++)
+                                {
+                                    s += boardState[x, y];
+                                    if (y == 7)
+                                    {
+                                        Debug.Log(s);
+                                    }
+                                }
+                            }
                         }
                     }
+
                 }
             }
         }
@@ -119,13 +146,12 @@ public class GameManager : MonoBehaviour {
         
         bool valid = false;
 
-        Debug.Log(pieceArray[row, col - 1]);
         int march;
 
 
         if (boardState[row, col - 1] == opSide && col > 1) // Left --------------------------------------
         {
-            Debug.Log("valid: left");
+            
             
             for (int a = 1; a <= col; a++)
             {
@@ -134,11 +160,13 @@ public class GameManager : MonoBehaviour {
                 {
                     affectedPieces.Remove(pieceArray[row, col - a]);
                     valid = true;
+                    Debug.Log("valid: left");
                     for (int c = 0; c < affectedPieces.Count; c++)
                     {
-                        affectedPieces[c].transform.Rotate(0, 0, 180);                       
+                        affectedPieces[c].transform.Rotate(0, 0, 180);
+                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;                      
                     }
-                    Debug.Log(affectedPieces);
+                    
                     points = affectedPieces.Count;
                     addPoints(side, points);
                     affectedPieces.Clear();
@@ -147,6 +175,7 @@ public class GameManager : MonoBehaviour {
 
                 if (boardState[row, col - a] == 0)
                 {
+                    affectedPieces.Clear();
                     break;
                 }
             }
@@ -154,20 +183,23 @@ public class GameManager : MonoBehaviour {
 
         if (boardState[row, col + 1] == opSide && col < 6) // Right --------------------------------------
         {
-            Debug.Log("valid: right");
+            
 
             for (int a = 1; a <= 7 - col; a++)
             {
                 affectedPieces.Add(pieceArray[row, col + a]);
-                if (boardState[row, col + a] == side) //Same Color
+                //affectedPieces.Add(pieceArray[col + a, row]);
+                if (boardState[row, col + 1] == side) //Same Color
                 {
                     affectedPieces.Remove(pieceArray[row, col + a]);
+                    //affectedPieces.Remove(pieceArray[col + a, row]);
                     valid = true;
                     for (int c = 0; c < affectedPieces.Count; c++)
                     {
                         affectedPieces[c].transform.Rotate(0, 0, 180);
+                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                     }
-                    Debug.Log(affectedPieces);
+                    Debug.Log("valid: right");
                     points = affectedPieces.Count;
                     addPoints(side, points);
                     affectedPieces.Clear();
@@ -176,14 +208,15 @@ public class GameManager : MonoBehaviour {
 
                 if (boardState[row, col + a] == 0)
                 {
+                    affectedPieces.Clear();
                     break;
                 }
             }
         }
 
-        if (boardState[row + 1, col] == opSide && row < 6) // Down --------------------------------------
+        if (boardState[row + 1, col] == opSide && row < 6) // Up --------------------------------------
         {
-            Debug.Log("valid down");
+            
 
             for (int a = 1; a <= 7 - row; a++)
             {
@@ -195,8 +228,9 @@ public class GameManager : MonoBehaviour {
                     for (int c = 0; c < affectedPieces.Count; c++)
                     {
                         affectedPieces[c].transform.Rotate(0, 0, 180);
+                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                     }
-                    Debug.Log(affectedPieces);
+                    Debug.Log("valid up");
                     points = affectedPieces.Count;
                     addPoints(side, points);
                     affectedPieces.Clear();
@@ -205,27 +239,33 @@ public class GameManager : MonoBehaviour {
 
                 if (boardState[row + a, col] == 0)
                 {
+                    affectedPieces.Clear();
                     break;
                 }
             }
         }
 
-        if (boardState[row - 1, col] == opSide && row > 1) // Up --------------------------------------
+        if (boardState[row - 1, col] == opSide && row > 1) // Down --------------------------------------
         {
-            Debug.Log("valid up");
+            
 
             for (int a = 1; a <= row; a++)
             {
                 affectedPieces.Add(pieceArray[row - a, col]);
+                //affectedPieces.Add(pieceArray[col, row - a]);
                 if (boardState[row - a, col] == side) //Same Color
                 {
                     affectedPieces.Remove(pieceArray[row - a, col]);
+                    //affectedPieces.Remove(pieceArray[col, row - a]);
                     valid = true;
                     for (int c = 0; c < affectedPieces.Count; c++)
                     {
+                        Debug.Log("Objects: " + affectedPieces[c]);
+                        Debug.Log("size: " + affectedPieces.Count);
                         affectedPieces[c].transform.Rotate(0, 0, 180);
+                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                     }
-                    Debug.Log(affectedPieces);
+                    Debug.Log("valid down");
                     points = affectedPieces.Count;
                     addPoints(side, points);
                     affectedPieces.Clear();
@@ -234,18 +274,19 @@ public class GameManager : MonoBehaviour {
 
                 if (boardState[row - a, col] == 0)
                 {
+                    affectedPieces.Clear();
                     break;
                 }
             }
         }
 
-        if (boardState[row + 1, col - 1] == opSide && row < 6 && col > 1) // bottom left --------------------------------------
+        if (boardState[row + 1, col - 1] == opSide && row < 6 && col > 1) // Top left --------------------------------------
         {
-            Debug.Log("valid bottom left");
+            
             march = marchLength(row, col, 0);
             for (int a = 1; a <= march; a++)
             {
-                affectedPieces.Add(pieceArray[row - a, col]);
+                affectedPieces.Add(pieceArray[row + a, col - a]);
                 if (boardState[row + a, col - a] == side) //Same Color
                 {
                     affectedPieces.Remove(pieceArray[row + a, col - a]);
@@ -253,8 +294,9 @@ public class GameManager : MonoBehaviour {
                     for (int c = 0; c < affectedPieces.Count; c++)
                     {
                         affectedPieces[c].transform.Rotate(0, 0, 180);
+                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                     }
-                    Debug.Log(affectedPieces);
+                    Debug.Log("valid top left");
                     points = affectedPieces.Count;
                     addPoints(side, points);
                     affectedPieces.Clear();
@@ -263,18 +305,19 @@ public class GameManager : MonoBehaviour {
 
                 if (boardState[row + a, col - a] == 0)
                 {
+                    affectedPieces.Clear();
                     break;
                 }
             }
         }
 
-        if (boardState[row + 1, col + 1] == opSide && row < 6 && col < 6) // bottom Right --------------------------------------
+        if (boardState[row + 1, col + 1] == opSide && row < 6 && col < 6) // Top Right --------------------------------------
         {
-            Debug.Log("valid bottom right");
+            
             march = marchLength(row, col, 1);
             for (int a = 1; a <= march; a++)
             {
-                affectedPieces.Add(pieceArray[row - a, col]);
+                affectedPieces.Add(pieceArray[row + a, col + a]);
                 if (boardState[row + a, col + a] == side) //Same Color
                 {
                     affectedPieces.Remove(pieceArray[row + a, col + a]);
@@ -282,8 +325,9 @@ public class GameManager : MonoBehaviour {
                     for (int c = 0; c < affectedPieces.Count; c++)
                     {
                         affectedPieces[c].transform.Rotate(0, 0, 180);
+                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                     }
-                    Debug.Log(affectedPieces);
+                    Debug.Log("valid top right");
                     points = affectedPieces.Count;
                     addPoints(side, points);
                     affectedPieces.Clear();
@@ -292,14 +336,15 @@ public class GameManager : MonoBehaviour {
 
                 if (boardState[row + a, col + a] == 0)
                 {
+                    affectedPieces.Clear();
                     break;
                 }
             }
         }
 
-        if (boardState[row - 1, col - 1] == opSide && row > 1 && col > 1) // Top Left --------------------------------------
+        if (boardState[row - 1, col - 1] == opSide && row > 1 && col > 1) // Bottom Left --------------------------------------
         {
-            Debug.Log("valid top left");
+            
             march = marchLength(row, col, 2);
             for (int a = 1; a <= march; a++)
             {
@@ -311,8 +356,9 @@ public class GameManager : MonoBehaviour {
                     for (int c = 0; c < affectedPieces.Count; c++)
                     {
                         affectedPieces[c].transform.Rotate(0, 0, 180);
+                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                     }
-                    Debug.Log(affectedPieces);
+                    Debug.Log("valid bottom left");
                     points = affectedPieces.Count;
                     addPoints(side, points);
                     affectedPieces.Clear();
@@ -321,27 +367,31 @@ public class GameManager : MonoBehaviour {
 
                 if (boardState[row - a, col - a] == 0)
                 {
+                    affectedPieces.Clear();
                     break;
                 }
             }
         }
 
-        if (boardState[row - 1, col + 1] == opSide && row > 1 && col < 6) // Top Right --------------------------------------
+        if (boardState[row - 1, col + 1] == opSide && row > 1 && col < 6) // Bottom Right --------------------------------------
         {
-            Debug.Log("valid top right");
+            
             march = marchLength(row, col, 3);
             for (int a = 1; a <= march; a++)
             {
                 affectedPieces.Add(pieceArray[row - a, col + a]);
-                if (boardState[row - a, col - a] == side) //Same Color
+                //affectedPieces.Add(pieceArray[col - a, row - a]);
+                if (boardState[row - a, col + a] == side) //Same Color
                 {
                     affectedPieces.Remove(pieceArray[row - a, col + a]);
+                    //affectedPieces.Remove(pieceArray[col - a, row - a]);
                     valid = true;
                     for (int c = 0; c < affectedPieces.Count; c++)
                     {
                         affectedPieces[c].transform.Rotate(0, 0, 180);
+                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                     }
-                    Debug.Log(affectedPieces);
+                    Debug.Log("valid bottom right");
                     points = affectedPieces.Count;
                     addPoints(side, points);
                     affectedPieces.Clear();
@@ -350,6 +400,7 @@ public class GameManager : MonoBehaviour {
 
                 if (boardState[row - a, col + a] == 0)
                 {
+                    affectedPieces.Clear();
                     break;
                 }
             }
@@ -364,7 +415,7 @@ public class GameManager : MonoBehaviour {
         int minRow;
         int minCol;
 
-        if (dir == 0) // Bottom Left
+        if (dir == 0) // Top Left
         {
             minCol = col;
             minRow = 7 - row;
@@ -378,7 +429,7 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        if (dir == 1) // Bottom Right
+        if (dir == 1) // Top Right
         {
             minCol = 7 - col;
             minRow = 7 - row;
@@ -392,7 +443,7 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        if (dir == 2) // Top Left
+        if (dir == 2) // Bottom Left
         {
             minCol = col;
             minRow = row;
@@ -406,7 +457,7 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        if (dir == 3) // Top Right
+        if (dir == 3) // Bottom Right
         {
             minCol = 7 - col;
             minRow = row;
