@@ -148,260 +148,281 @@ public class GameManager : MonoBehaviour {
 
         int march;
 
-
-        if (boardState[row, col - 1] == opSide && col > 1) // Left --------------------------------------
+        if (col > 1)
         {
-            
-            
-            for (int a = 1; a <= col; a++)
+            if (boardState[row, col - 1] == opSide) // Left --------------------------------------
             {
-                affectedPieces.Add(pieceArray[row, col - a]);
-                if (boardState[row, col - a] == side) //Same Color
-                {
-                    affectedPieces.Remove(pieceArray[row, col - a]);
-                    valid = true;
-                    Debug.Log("valid: left");
-                    for (int c = 0; c < affectedPieces.Count; c++)
-                    {
-                        affectedPieces[c].transform.Rotate(0, 0, 180);
-                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;                      
-                    }
-                    
-                    points = affectedPieces.Count;
-                    addPoints(side, points);
-                    affectedPieces.Clear();
-                    break;
-                }
 
-                if (boardState[row, col - a] == 0)
+
+                for (int a = 1; a <= col; a++)
                 {
-                    affectedPieces.Clear();
-                    break;
+                    affectedPieces.Add(pieceArray[row, col - a]);
+                    if (boardState[row, col - a] == side) //Same Color
+                    {
+                        affectedPieces.Remove(pieceArray[row, col - a]);
+                        valid = true;
+                        Debug.Log("valid: left");
+                        for (int c = 0; c < affectedPieces.Count; c++)
+                        {
+                            affectedPieces[c].transform.Rotate(0, 0, 180);
+                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                        }
+
+                        points = affectedPieces.Count;
+                        addPoints(side, points);
+                        affectedPieces.Clear();
+                        break;
+                    }
+
+                    if (boardState[row, col - a] == 0)
+                    {
+                        affectedPieces.Clear();
+                        break;
+                    }
                 }
             }
         }
 
-        if (boardState[row, col + 1] == opSide && col < 6) // Right --------------------------------------
+        if (col < 6)
         {
-            
-
-            for (int a = 1; a <= 7 - col; a++)
+            if (boardState[row, col + 1] == opSide) // Right --------------------------------------
             {
-                affectedPieces.Add(pieceArray[row, col + a]);
-                //affectedPieces.Add(pieceArray[col + a, row]);
-                if (boardState[row, col + 1] == side) //Same Color
-                {
-                    affectedPieces.Remove(pieceArray[row, col + a]);
-                    //affectedPieces.Remove(pieceArray[col + a, row]);
-                    valid = true;
-                    for (int c = 0; c < affectedPieces.Count; c++)
-                    {
-                        affectedPieces[c].transform.Rotate(0, 0, 180);
-                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
-                    }
-                    Debug.Log("valid: right");
-                    points = affectedPieces.Count;
-                    addPoints(side, points);
-                    affectedPieces.Clear();
-                    break;
-                }
 
-                if (boardState[row, col + a] == 0)
+
+                for (int a = 1; a <= 7 - col; a++)
                 {
-                    affectedPieces.Clear();
-                    break;
+                    affectedPieces.Add(pieceArray[row, col + a]);
+                    //affectedPieces.Add(pieceArray[col + a, row]);
+                    if (boardState[row, col + 1] == side) //Same Color
+                    {
+                        affectedPieces.Remove(pieceArray[row, col + a]);
+                        //affectedPieces.Remove(pieceArray[col + a, row]);
+                        valid = true;
+                        for (int c = 0; c < affectedPieces.Count; c++)
+                        {
+                            affectedPieces[c].transform.Rotate(0, 0, 180);
+                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                        }
+                        Debug.Log("valid: right");
+                        points = affectedPieces.Count;
+                        addPoints(side, points);
+                        affectedPieces.Clear();
+                        break;
+                    }
+
+                    if (boardState[row, col + a] == 0)
+                    {
+                        affectedPieces.Clear();
+                        break;
+                    }
                 }
             }
         }
 
-        if (boardState[row + 1, col] == opSide && row < 6) // Up --------------------------------------
+        if (row < 6)
         {
-            
-
-            for (int a = 1; a <= 7 - row; a++)
+            if (boardState[row + 1, col] == opSide) // Up --------------------------------------
             {
-                affectedPieces.Add(pieceArray[row + a, col]);
-                if (boardState[row + a, col] == side) //Same Color
-                {
-                    affectedPieces.Remove(pieceArray[row + a, col]);
-                    valid = true;
-                    for (int c = 0; c < affectedPieces.Count; c++)
-                    {
-                        affectedPieces[c].transform.Rotate(0, 0, 180);
-                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
-                    }
-                    Debug.Log("valid up");
-                    points = affectedPieces.Count;
-                    addPoints(side, points);
-                    affectedPieces.Clear();
-                    break;
-                }
 
-                if (boardState[row + a, col] == 0)
+
+                for (int a = 1; a <= 7 - row; a++)
                 {
-                    affectedPieces.Clear();
-                    break;
+                    affectedPieces.Add(pieceArray[row + a, col]);
+                    if (boardState[row + a, col] == side) //Same Color
+                    {
+                        affectedPieces.Remove(pieceArray[row + a, col]);
+                        valid = true;
+                        for (int c = 0; c < affectedPieces.Count; c++)
+                        {
+                            affectedPieces[c].transform.Rotate(0, 0, 180);
+                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                        }
+                        Debug.Log("valid up");
+                        points = affectedPieces.Count;
+                        addPoints(side, points);
+                        affectedPieces.Clear();
+                        break;
+                    }
+
+                    if (boardState[row + a, col] == 0)
+                    {
+                        affectedPieces.Clear();
+                        break;
+                    }
                 }
             }
         }
 
-        if (boardState[row - 1, col] == opSide && row > 1) // Down --------------------------------------
+        if (row > 1)
         {
-            
-
-            for (int a = 1; a <= row; a++)
+            if (boardState[row - 1, col] == opSide) // Down --------------------------------------
             {
-                affectedPieces.Add(pieceArray[row - a, col]);
-                //affectedPieces.Add(pieceArray[col, row - a]);
-                if (boardState[row - a, col] == side) //Same Color
+                for (int a = 1; a <= row; a++)
                 {
-                    affectedPieces.Remove(pieceArray[row - a, col]);
-                    //affectedPieces.Remove(pieceArray[col, row - a]);
-                    valid = true;
-                    for (int c = 0; c < affectedPieces.Count; c++)
+                    affectedPieces.Add(pieceArray[row - a, col]);
+                    //affectedPieces.Add(pieceArray[col, row - a]);
+                    if (boardState[row - a, col] == side) //Same Color
                     {
-                        Debug.Log("Objects: " + affectedPieces[c]);
-                        Debug.Log("size: " + affectedPieces.Count);
-                        affectedPieces[c].transform.Rotate(0, 0, 180);
-                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                        affectedPieces.Remove(pieceArray[row - a, col]);
+                        //affectedPieces.Remove(pieceArray[col, row - a]);
+                        valid = true;
+                        for (int c = 0; c < affectedPieces.Count; c++)
+                        {
+                            Debug.Log("Objects: " + affectedPieces[c]);
+                            Debug.Log("size: " + affectedPieces.Count);
+                            affectedPieces[c].transform.Rotate(0, 0, 180);
+                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                        }
+                        Debug.Log("valid down");
+                        points = affectedPieces.Count;
+                        addPoints(side, points);
+                        affectedPieces.Clear();
+                        break;
                     }
-                    Debug.Log("valid down");
-                    points = affectedPieces.Count;
-                    addPoints(side, points);
-                    affectedPieces.Clear();
-                    break;
-                }
 
-                if (boardState[row - a, col] == 0)
-                {
-                    affectedPieces.Clear();
-                    break;
+                    if (boardState[row - a, col] == 0)
+                    {
+                        affectedPieces.Clear();
+                        break;
+                    }
                 }
             }
         }
 
-        if (boardState[row + 1, col - 1] == opSide && row < 6 && col > 1) // Top left --------------------------------------
+        if (row < 6 && col > 1)
         {
-            
-            march = marchLength(row, col, 0);
-            for (int a = 1; a <= march; a++)
+            if (boardState[row + 1, col - 1] == opSide) // Top left --------------------------------------
             {
-                affectedPieces.Add(pieceArray[row + a, col - a]);
-                if (boardState[row + a, col - a] == side) //Same Color
-                {
-                    affectedPieces.Remove(pieceArray[row + a, col - a]);
-                    valid = true;
-                    for (int c = 0; c < affectedPieces.Count; c++)
-                    {
-                        affectedPieces[c].transform.Rotate(0, 0, 180);
-                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
-                    }
-                    Debug.Log("valid top left");
-                    points = affectedPieces.Count;
-                    addPoints(side, points);
-                    affectedPieces.Clear();
-                    break;
-                }
 
-                if (boardState[row + a, col - a] == 0)
+                march = marchLength(row, col, 0);
+                for (int a = 1; a <= march; a++)
                 {
-                    affectedPieces.Clear();
-                    break;
+                    affectedPieces.Add(pieceArray[row + a, col - a]);
+                    if (boardState[row + a, col - a] == side) //Same Color
+                    {
+                        affectedPieces.Remove(pieceArray[row + a, col - a]);
+                        valid = true;
+                        for (int c = 0; c < affectedPieces.Count; c++)
+                        {
+                            affectedPieces[c].transform.Rotate(0, 0, 180);
+                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                        }
+                        Debug.Log("valid top left");
+                        points = affectedPieces.Count;
+                        addPoints(side, points);
+                        affectedPieces.Clear();
+                        break;
+                    }
+
+                    if (boardState[row + a, col - a] == 0)
+                    {
+                        affectedPieces.Clear();
+                        break;
+                    }
                 }
             }
         }
 
-        if (boardState[row + 1, col + 1] == opSide && row < 6 && col < 6) // Top Right --------------------------------------
+        if (row < 6 && col < 6)
         {
-            
-            march = marchLength(row, col, 1);
-            for (int a = 1; a <= march; a++)
+            if (boardState[row + 1, col + 1] == opSide) // Top Right --------------------------------------
             {
-                affectedPieces.Add(pieceArray[row + a, col + a]);
-                if (boardState[row + a, col + a] == side) //Same Color
-                {
-                    affectedPieces.Remove(pieceArray[row + a, col + a]);
-                    valid = true;
-                    for (int c = 0; c < affectedPieces.Count; c++)
-                    {
-                        affectedPieces[c].transform.Rotate(0, 0, 180);
-                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
-                    }
-                    Debug.Log("valid top right");
-                    points = affectedPieces.Count;
-                    addPoints(side, points);
-                    affectedPieces.Clear();
-                    break;
-                }
 
-                if (boardState[row + a, col + a] == 0)
+                march = marchLength(row, col, 1);
+                for (int a = 1; a <= march; a++)
                 {
-                    affectedPieces.Clear();
-                    break;
+                    affectedPieces.Add(pieceArray[row + a, col + a]);
+                    if (boardState[row + a, col + a] == side) //Same Color
+                    {
+                        affectedPieces.Remove(pieceArray[row + a, col + a]);
+                        valid = true;
+                        for (int c = 0; c < affectedPieces.Count; c++)
+                        {
+                            affectedPieces[c].transform.Rotate(0, 0, 180);
+                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                        }
+                        Debug.Log("valid top right");
+                        points = affectedPieces.Count;
+                        addPoints(side, points);
+                        affectedPieces.Clear();
+                        break;
+                    }
+
+                    if (boardState[row + a, col + a] == 0)
+                    {
+                        affectedPieces.Clear();
+                        break;
+                    }
                 }
             }
         }
 
-        if (boardState[row - 1, col - 1] == opSide && row > 1 && col > 1) // Bottom Left --------------------------------------
+        if (row > 1 && col > 1)
         {
-            
-            march = marchLength(row, col, 2);
-            for (int a = 1; a <= march; a++)
+            if (boardState[row - 1, col - 1] == opSide) // Bottom Left --------------------------------------
             {
-                affectedPieces.Add(pieceArray[row - a, col - a]);
-                if (boardState[row - a, col - a] == side) //Same Color
-                {
-                    affectedPieces.Remove(pieceArray[row - a, col - a]);
-                    valid = true;
-                    for (int c = 0; c < affectedPieces.Count; c++)
-                    {
-                        affectedPieces[c].transform.Rotate(0, 0, 180);
-                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
-                    }
-                    Debug.Log("valid bottom left");
-                    points = affectedPieces.Count;
-                    addPoints(side, points);
-                    affectedPieces.Clear();
-                    break;
-                }
 
-                if (boardState[row - a, col - a] == 0)
+                march = marchLength(row, col, 2);
+                for (int a = 1; a <= march; a++)
                 {
-                    affectedPieces.Clear();
-                    break;
+                    affectedPieces.Add(pieceArray[row - a, col - a]);
+                    if (boardState[row - a, col - a] == side) //Same Color
+                    {
+                        affectedPieces.Remove(pieceArray[row - a, col - a]);
+                        valid = true;
+                        for (int c = 0; c < affectedPieces.Count; c++)
+                        {
+                            affectedPieces[c].transform.Rotate(0, 0, 180);
+                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                        }
+                        Debug.Log("valid bottom left");
+                        points = affectedPieces.Count;
+                        addPoints(side, points);
+                        affectedPieces.Clear();
+                        break;
+                    }
+
+                    if (boardState[row - a, col - a] == 0)
+                    {
+                        affectedPieces.Clear();
+                        break;
+                    }
                 }
             }
         }
 
-        if (boardState[row - 1, col + 1] == opSide && row > 1 && col < 6) // Bottom Right --------------------------------------
+        if (row > 1 && col < 6)
         {
-            
-            march = marchLength(row, col, 3);
-            for (int a = 1; a <= march; a++)
+            if (boardState[row - 1, col + 1] == opSide) // Bottom Right --------------------------------------
             {
-                affectedPieces.Add(pieceArray[row - a, col + a]);
-                //affectedPieces.Add(pieceArray[col - a, row - a]);
-                if (boardState[row - a, col + a] == side) //Same Color
-                {
-                    affectedPieces.Remove(pieceArray[row - a, col + a]);
-                    //affectedPieces.Remove(pieceArray[col - a, row - a]);
-                    valid = true;
-                    for (int c = 0; c < affectedPieces.Count; c++)
-                    {
-                        affectedPieces[c].transform.Rotate(0, 0, 180);
-                        boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
-                    }
-                    Debug.Log("valid bottom right");
-                    points = affectedPieces.Count;
-                    addPoints(side, points);
-                    affectedPieces.Clear();
-                    break;
-                }
 
-                if (boardState[row - a, col + a] == 0)
+                march = marchLength(row, col, 3);
+                for (int a = 1; a <= march; a++)
                 {
-                    affectedPieces.Clear();
-                    break;
+                    affectedPieces.Add(pieceArray[row - a, col + a]);
+                    //affectedPieces.Add(pieceArray[col - a, row - a]);
+                    if (boardState[row - a, col + a] == side) //Same Color
+                    {
+                        affectedPieces.Remove(pieceArray[row - a, col + a]);
+                        //affectedPieces.Remove(pieceArray[col - a, row - a]);
+                        valid = true;
+                        for (int c = 0; c < affectedPieces.Count; c++)
+                        {
+                            affectedPieces[c].transform.Rotate(0, 0, 180);
+                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                        }
+                        Debug.Log("valid bottom right");
+                        points = affectedPieces.Count;
+                        addPoints(side, points);
+                        affectedPieces.Clear();
+                        break;
+                    }
+
+                    if (boardState[row - a, col + a] == 0)
+                    {
+                        affectedPieces.Clear();
+                        break;
+                    }
                 }
             }
         }
