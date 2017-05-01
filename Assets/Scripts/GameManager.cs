@@ -7,12 +7,13 @@ public class GameManager : MonoBehaviour {
     public List<GameObject> pieceList;
     public GameObject[,] pieceArray = new GameObject[8, 8];
     public GameObject piece;
+    public int playerScore = 2;
+    public int oppositeScore = 2;
 
     private int playerSide = 1;
     private int oppositeSide = 2;
 
-    private int playerScore = 2;
-    private int oppositeScore = 2;
+    
     private int points;
 
 
@@ -38,7 +39,7 @@ public class GameManager : MonoBehaviour {
             for (int x = 0; x < 8; x++)
             {
 
-                pieceArray[x, y] = pieceList[x * 8 + y];
+                pieceArray[y, x] = pieceList[y * 8 + x];
 
             }
         }
@@ -50,10 +51,10 @@ public class GameManager : MonoBehaviour {
         pieceArray[4, 4].GetComponent<Rigidbody>().useGravity = true;
 
         // Intial White
-        pieceArray[3, 4].transform.position = new Vector3(3.5f, 10, 4.5f);
+        pieceArray[3, 4].transform.position = new Vector3(4.5f, 10, 3.5f);
         pieceArray[3, 4].transform.Rotate(180, 0, 0);
         pieceArray[3, 4].GetComponent<Rigidbody>().useGravity = true;
-        pieceArray[4, 3].transform.position = new Vector3(4.5f, 10, 3.5f);
+        pieceArray[4, 3].transform.position = new Vector3(3.5f, 10, 4.5f);
         pieceArray[4, 3].transform.Rotate(180, 0, 0);
         pieceArray[4, 3].GetComponent<Rigidbody>().useGravity = true;
         //playerSide = 1;
@@ -94,6 +95,7 @@ public class GameManager : MonoBehaviour {
                             pieceArray[row, col].transform.position = insertPoint;
                             pieceArray[row, col].transform.Rotate(180, 0, 0);
                             pieceArray[row, col].GetComponent<Rigidbody>().useGravity = true;
+                            playerScore += 1;
                             playerSide = 2;
                             oppositeSide = 1;
                             for (int x = 0; x < 8; x++)
@@ -118,6 +120,7 @@ public class GameManager : MonoBehaviour {
                             boardState[row, col] = playerSide;
                             pieceArray[row, col].transform.position = insertPoint;
                             pieceArray[row, col].GetComponent<Rigidbody>().useGravity = true;
+                            oppositeScore += 1;
                             playerSide = 1;
                             oppositeSide = 2;
                             for (int x = 0; x < 8; x++)
@@ -193,7 +196,7 @@ public class GameManager : MonoBehaviour {
                 {
                     affectedPieces.Add(pieceArray[row, col + a]);
                     //affectedPieces.Add(pieceArray[col + a, row]);
-                    if (boardState[row, col + 1] == side) //Same Color
+                    if (boardState[row, col + a] == side) //Same Color
                     {
                         affectedPieces.Remove(pieceArray[row, col + a]);
                         //affectedPieces.Remove(pieceArray[col + a, row]);
@@ -236,6 +239,7 @@ public class GameManager : MonoBehaviour {
                         {
                             affectedPieces[c].transform.Rotate(0, 0, 180);
                             boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            
                         }
                         Debug.Log("valid up");
                         points = affectedPieces.Count;
@@ -252,19 +256,22 @@ public class GameManager : MonoBehaviour {
                 }
             }
         }
-
+        
         if (row > 1)
         {
             if (boardState[row - 1, col] == opSide) // Down --------------------------------------
             {
                 for (int a = 1; a <= row; a++)
                 {
+                    Debug.Log("Test row: " + (row - a));
+                    Debug.Log("Test col: " + (col));
+
                     affectedPieces.Add(pieceArray[row - a, col]);
                     //affectedPieces.Add(pieceArray[col, row - a]);
                     if (boardState[row - a, col] == side) //Same Color
                     {
                         affectedPieces.Remove(pieceArray[row - a, col]);
-                        //affectedPieces.Remove(pieceArray[col, row - a]);
+                        //affectedPieces.Remove(pieceArray[row, col]);
                         valid = true;
                         for (int c = 0; c < affectedPieces.Count; c++)
                         {
@@ -272,6 +279,8 @@ public class GameManager : MonoBehaviour {
                             Debug.Log("size: " + affectedPieces.Count);
                             affectedPieces[c].transform.Rotate(0, 0, 180);
                             boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            Debug.Log("z-coord: " + (int)affectedPieces[c].transform.position.z);
+                            Debug.Log("x-coord: " + (int)affectedPieces[c].transform.position.x);
                         }
                         Debug.Log("valid down");
                         points = affectedPieces.Count;
@@ -506,7 +515,7 @@ public class GameManager : MonoBehaviour {
         if (side == 2)
         {
             playerScore -= points;
-            oppositeScore -= points;
+            oppositeScore += points;
         }
     }
 
