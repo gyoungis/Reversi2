@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\PlayerScoreScript.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
+     <Compile Include="Assets\TurnScript.cs" />
      <Compile Include="Assets\eScore.cs" />
      <Compile Include="Assets\pScore.cs" />
  <Reference Include="UnityEngine.UI">

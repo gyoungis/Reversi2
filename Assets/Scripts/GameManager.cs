@@ -101,11 +101,11 @@ public class GameManager : MonoBehaviour {
                             playerSide = 2;
                             oppositeSide = 1;
 
-                            //if (validMoves(2, 1) == 0)
-                            //{
-                            //    playerSide = 1;
-                            //    oppositeSide = 2;
-                            //}
+                            if (validMoves(2, 1) == 0)
+                            {
+                                playerSide = 1;
+                                oppositeSide = 2;
+                            }
 
                             for (int x = 0; x < 8; x++)
                             {
@@ -134,11 +134,11 @@ public class GameManager : MonoBehaviour {
                             playerSide = 1;
                             oppositeSide = 2;
 
-                            //if (validMoves(1, 2) > 0)
-                            //{
-                            //    playerSide = 2;
-                            //    oppositeSide = 1;
-                            //}
+                            if (validMoves(1, 2) == 0)
+                            {
+                                playerSide = 2;
+                                oppositeSide = 1;
+                            }
 
                             for (int x = 0; x < 8; x++)
                             {
@@ -193,7 +193,10 @@ public class GameManager : MonoBehaviour {
 
                         points = affectedPieces.Count;
                         totalPoints += points;
-                        addPoints(side, points);
+                        if (counting == false)
+                        {
+                            addPoints(side, points);
+                        }
                         affectedPieces.Clear();
                         break;
                     }
@@ -233,7 +236,10 @@ public class GameManager : MonoBehaviour {
                         Debug.Log("valid: right");
                         points = affectedPieces.Count;
                         totalPoints += points;
-                        addPoints(side, points);
+                        if (counting == false)
+                        {
+                            addPoints(side, points);
+                        }
                         affectedPieces.Clear();
                         break;
                     }
@@ -271,7 +277,10 @@ public class GameManager : MonoBehaviour {
                         Debug.Log("valid up");
                         points = affectedPieces.Count;
                         totalPoints += points;
-                        addPoints(side, points);
+                        if (counting == false)
+                        {
+                            addPoints(side, points);
+                        }
                         affectedPieces.Clear();
                         break;
                     }
@@ -312,7 +321,10 @@ public class GameManager : MonoBehaviour {
                         Debug.Log("valid down");
                         points = affectedPieces.Count;
                         totalPoints += points;
-                        addPoints(side, points);
+                        if (counting == false)
+                        {
+                            addPoints(side, points);
+                        }
                         affectedPieces.Clear();
                         break;
                     }
@@ -350,7 +362,10 @@ public class GameManager : MonoBehaviour {
                         Debug.Log("valid top left");
                         points = affectedPieces.Count;
                         totalPoints += points;
-                        addPoints(side, points);
+                        if (counting == false)
+                        {
+                            addPoints(side, points);
+                        }
                         affectedPieces.Clear();
                         break;
                     }
@@ -388,7 +403,10 @@ public class GameManager : MonoBehaviour {
                         Debug.Log("valid top right");
                         points = affectedPieces.Count;
                         totalPoints += points;
-                        addPoints(side, points);
+                        if (counting == false)
+                        {
+                            addPoints(side, points);
+                        }
                         affectedPieces.Clear();
                         break;
                     }
@@ -426,7 +444,10 @@ public class GameManager : MonoBehaviour {
                         Debug.Log("valid bottom left");
                         points = affectedPieces.Count;
                         totalPoints += points;
-                        addPoints(side, points);
+                        if (counting == false)
+                        {
+                            addPoints(side, points);
+                        }
                         affectedPieces.Clear();
                         break;
                     }
@@ -466,7 +487,10 @@ public class GameManager : MonoBehaviour {
                         Debug.Log("valid bottom right");
                         points = affectedPieces.Count;
                         totalPoints += points;
-                        addPoints(side, points);
+                        if (counting == false)
+                        {
+                            addPoints(side, points);
+                        }
                         affectedPieces.Clear();
                         break;
                     }
@@ -587,6 +611,9 @@ public class GameManager : MonoBehaviour {
             }
         }
         moves = rows.Count;
+        rows.Clear();
+        cols.Clear();
+        movePoints.Clear();
         return moves;
     }
 }
