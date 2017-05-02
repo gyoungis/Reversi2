@@ -9,13 +9,15 @@ public class GameManager : MonoBehaviour {
     public GameObject piece;
     public int playerScore = 2;
     public int oppositeScore = 2;
+    public bool skipTurn = false;
 
-    private int playerSide = 1;
+    public int playerSide = 1;
     private int oppositeSide = 2;
 
+    private bool counting;
     
     private int points;
-
+    private int totalPoints;
 
     
     private List<GameObject> affectedPieces;
@@ -57,8 +59,7 @@ public class GameManager : MonoBehaviour {
         pieceArray[4, 3].transform.position = new Vector3(3.5f, 10, 4.5f);
         pieceArray[4, 3].transform.Rotate(180, 0, 0);
         pieceArray[4, 3].GetComponent<Rigidbody>().useGravity = true;
-        //playerSide = 1;
-        //oppositeSide = 2;
+
     }
 	
 	// Update is called once per frame
@@ -88,8 +89,9 @@ public class GameManager : MonoBehaviour {
                 {
                     if (playerSide == 1)
                     {
+                        bool counting = false;
                         insertPoint = new Vector3(i+0.5f, 10, j+0.5f);
-                        if (checkValidMove(row, col, playerSide, oppositeSide))
+                        if (checkValidMove(row, col, playerSide, oppositeSide, counting))
                         {
                             boardState[row, col] = playerSide;
                             pieceArray[row, col].transform.position = insertPoint;
@@ -98,6 +100,13 @@ public class GameManager : MonoBehaviour {
                             playerScore += 1;
                             playerSide = 2;
                             oppositeSide = 1;
+
+                            //if (validMoves(2, 1) == 0)
+                            //{
+                            //    playerSide = 1;
+                            //    oppositeSide = 2;
+                            //}
+
                             for (int x = 0; x < 8; x++)
                             {
                                 string s = "";
@@ -114,7 +123,8 @@ public class GameManager : MonoBehaviour {
                     }
                     else
                     {
-                        if (checkValidMove(row, col, playerSide, oppositeSide))
+                        counting = false;
+                        if (checkValidMove(row, col, playerSide, oppositeSide, counting))
                         {
                             insertPoint = new Vector3(i + 0.5f, 10, j + 0.5f);
                             boardState[row, col] = playerSide;
@@ -123,6 +133,13 @@ public class GameManager : MonoBehaviour {
                             oppositeScore += 1;
                             playerSide = 1;
                             oppositeSide = 2;
+
+                            //if (validMoves(1, 2) > 0)
+                            //{
+                            //    playerSide = 2;
+                            //    oppositeSide = 1;
+                            //}
+
                             for (int x = 0; x < 8; x++)
                             {
                                 string s = "";
@@ -144,40 +161,44 @@ public class GameManager : MonoBehaviour {
 
     }
 
-    bool checkValidMove(int row, int col, int side, int opSide)
+    bool checkValidMove(int row, int col, int side, int opSide, bool counting)
     {
-        
         bool valid = false;
-
+        totalPoints = 0;
         int march;
 
-        if (col > 1)
+        if (col > 1) // Check for edge
         {
             if (boardState[row, col - 1] == opSide) // Left --------------------------------------
             {
 
-
-                for (int a = 1; a <= col; a++)
+                for (int a = 1; a <= col; a++) // march along pieces to edge
                 {
                     affectedPieces.Add(pieceArray[row, col - a]);
                     if (boardState[row, col - a] == side) //Same Color
                     {
-                        affectedPieces.Remove(pieceArray[row, col - a]);
+                        affectedPieces.Remove(pieceArray[row, col - a]); // Don't flip your own piece
                         valid = true;
                         Debug.Log("valid: left");
-                        for (int c = 0; c < affectedPieces.Count; c++)
+                        if (counting == false)
                         {
-                            affectedPieces[c].transform.Rotate(0, 0, 180);
-                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            for (int c = 0; c < affectedPieces.Count; c++)
+                            {
+                                // Flip affected pieces
+
+                                affectedPieces[c].transform.Rotate(0, 0, 180);
+                                boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            }
                         }
 
                         points = affectedPieces.Count;
+                        totalPoints += points;
                         addPoints(side, points);
                         affectedPieces.Clear();
                         break;
                     }
 
-                    if (boardState[row, col - a] == 0)
+                    if (boardState[row, col - a] == 0) // If you don't hit your own piece again
                     {
                         affectedPieces.Clear();
                         break;
@@ -201,13 +222,17 @@ public class GameManager : MonoBehaviour {
                         affectedPieces.Remove(pieceArray[row, col + a]);
                         
                         valid = true;
-                        for (int c = 0; c < affectedPieces.Count; c++)
+                        if (counting == false)
                         {
-                            affectedPieces[c].transform.Rotate(0, 0, 180);
-                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            for (int c = 0; c < affectedPieces.Count; c++)
+                            {
+                                affectedPieces[c].transform.Rotate(0, 0, 180);
+                                boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            }
                         }
                         Debug.Log("valid: right");
                         points = affectedPieces.Count;
+                        totalPoints += points;
                         addPoints(side, points);
                         affectedPieces.Clear();
                         break;
@@ -235,14 +260,17 @@ public class GameManager : MonoBehaviour {
                     {
                         affectedPieces.Remove(pieceArray[row + a, col]);
                         valid = true;
-                        for (int c = 0; c < affectedPieces.Count; c++)
+                        if (counting == false)
                         {
-                            affectedPieces[c].transform.Rotate(0, 0, 180);
-                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
-                            
+                            for (int c = 0; c < affectedPieces.Count; c++)
+                            {
+                                affectedPieces[c].transform.Rotate(0, 0, 180);
+                                boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            }
                         }
                         Debug.Log("valid up");
                         points = affectedPieces.Count;
+                        totalPoints += points;
                         addPoints(side, points);
                         affectedPieces.Clear();
                         break;
@@ -273,17 +301,17 @@ public class GameManager : MonoBehaviour {
                         affectedPieces.Remove(pieceArray[row - a, col]);
                         
                         valid = true;
-                        for (int c = 0; c < affectedPieces.Count; c++)
+                        if (counting == false)
                         {
-                            Debug.Log("Objects: " + affectedPieces[c]);
-                            Debug.Log("size: " + affectedPieces.Count);
-                            affectedPieces[c].transform.Rotate(0, 0, 180);
-                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
-                            Debug.Log("z-coord: " + (int)affectedPieces[c].transform.position.z);
-                            Debug.Log("x-coord: " + (int)affectedPieces[c].transform.position.x);
+                            for (int c = 0; c < affectedPieces.Count; c++)
+                            {
+                                affectedPieces[c].transform.Rotate(0, 0, 180);
+                                boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            }
                         }
                         Debug.Log("valid down");
                         points = affectedPieces.Count;
+                        totalPoints += points;
                         addPoints(side, points);
                         affectedPieces.Clear();
                         break;
@@ -311,13 +339,17 @@ public class GameManager : MonoBehaviour {
                     {
                         affectedPieces.Remove(pieceArray[row + a, col - a]);
                         valid = true;
-                        for (int c = 0; c < affectedPieces.Count; c++)
+                        if (counting == false)
                         {
-                            affectedPieces[c].transform.Rotate(0, 0, 180);
-                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            for (int c = 0; c < affectedPieces.Count; c++)
+                            {
+                                affectedPieces[c].transform.Rotate(0, 0, 180);
+                                boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            }
                         }
                         Debug.Log("valid top left");
                         points = affectedPieces.Count;
+                        totalPoints += points;
                         addPoints(side, points);
                         affectedPieces.Clear();
                         break;
@@ -345,13 +377,17 @@ public class GameManager : MonoBehaviour {
                     {
                         affectedPieces.Remove(pieceArray[row + a, col + a]);
                         valid = true;
-                        for (int c = 0; c < affectedPieces.Count; c++)
+                        if (counting == false)
                         {
-                            affectedPieces[c].transform.Rotate(0, 0, 180);
-                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            for (int c = 0; c < affectedPieces.Count; c++)
+                            {
+                                affectedPieces[c].transform.Rotate(0, 0, 180);
+                                boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            }
                         }
                         Debug.Log("valid top right");
                         points = affectedPieces.Count;
+                        totalPoints += points;
                         addPoints(side, points);
                         affectedPieces.Clear();
                         break;
@@ -379,13 +415,17 @@ public class GameManager : MonoBehaviour {
                     {
                         affectedPieces.Remove(pieceArray[row - a, col - a]);
                         valid = true;
-                        for (int c = 0; c < affectedPieces.Count; c++)
+                        if (counting == false)
                         {
-                            affectedPieces[c].transform.Rotate(0, 0, 180);
-                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            for (int c = 0; c < affectedPieces.Count; c++)
+                            {
+                                affectedPieces[c].transform.Rotate(0, 0, 180);
+                                boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            }
                         }
                         Debug.Log("valid bottom left");
                         points = affectedPieces.Count;
+                        totalPoints += points;
                         addPoints(side, points);
                         affectedPieces.Clear();
                         break;
@@ -415,13 +455,17 @@ public class GameManager : MonoBehaviour {
                         affectedPieces.Remove(pieceArray[row - a, col + a]);
                         
                         valid = true;
-                        for (int c = 0; c < affectedPieces.Count; c++)
+                        if (counting == false)
                         {
-                            affectedPieces[c].transform.Rotate(0, 0, 180);
-                            boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            for (int c = 0; c < affectedPieces.Count; c++)
+                            {
+                                affectedPieces[c].transform.Rotate(0, 0, 180);
+                                boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
+                            }
                         }
                         Debug.Log("valid bottom right");
                         points = affectedPieces.Count;
+                        totalPoints += points;
                         addPoints(side, points);
                         affectedPieces.Clear();
                         break;
@@ -521,20 +565,23 @@ public class GameManager : MonoBehaviour {
 
     int validMoves(int side, int opSide)
     {
+        counting = true;
         int moves = 0;
         List<int> rows = new List<int>();
         List<int> cols = new List<int>();
-
+        List<int> movePoints = new List<int>();
+        movePoints.Clear();
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
                 if (boardState[i, j] == 0)
                 {
-                    if (checkValidMove(i, j, side, opSide))
+                    if (checkValidMove(i, j, side, opSide, counting) == true)
                     {
                         rows.Add(i);
                         cols.Add(j);
+                        movePoints.Add(totalPoints);                                            
                     }
                 }
             }
