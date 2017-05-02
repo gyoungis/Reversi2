@@ -195,11 +195,11 @@ public class GameManager : MonoBehaviour {
                 for (int a = 1; a <= 7 - col; a++)
                 {
                     affectedPieces.Add(pieceArray[row, col + a]);
-                    //affectedPieces.Add(pieceArray[col + a, row]);
+                    
                     if (boardState[row, col + a] == side) //Same Color
                     {
                         affectedPieces.Remove(pieceArray[row, col + a]);
-                        //affectedPieces.Remove(pieceArray[col + a, row]);
+                        
                         valid = true;
                         for (int c = 0; c < affectedPieces.Count; c++)
                         {
@@ -267,11 +267,11 @@ public class GameManager : MonoBehaviour {
                     Debug.Log("Test col: " + (col));
 
                     affectedPieces.Add(pieceArray[row - a, col]);
-                    //affectedPieces.Add(pieceArray[col, row - a]);
+                    
                     if (boardState[row - a, col] == side) //Same Color
                     {
                         affectedPieces.Remove(pieceArray[row - a, col]);
-                        //affectedPieces.Remove(pieceArray[row, col]);
+                        
                         valid = true;
                         for (int c = 0; c < affectedPieces.Count; c++)
                         {
@@ -409,11 +409,11 @@ public class GameManager : MonoBehaviour {
                 for (int a = 1; a <= march; a++)
                 {
                     affectedPieces.Add(pieceArray[row - a, col + a]);
-                    //affectedPieces.Add(pieceArray[col - a, row - a]);
+                    
                     if (boardState[row - a, col + a] == side) //Same Color
                     {
                         affectedPieces.Remove(pieceArray[row - a, col + a]);
-                        //affectedPieces.Remove(pieceArray[col - a, row - a]);
+                        
                         valid = true;
                         for (int c = 0; c < affectedPieces.Count; c++)
                         {
@@ -519,4 +519,27 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    int validMoves(int side, int opSide)
+    {
+        int moves = 0;
+        List<int> rows = new List<int>();
+        List<int> cols = new List<int>();
+
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (boardState[i, j] == 0)
+                {
+                    if (checkValidMove(i, j, side, opSide))
+                    {
+                        rows.Add(i);
+                        cols.Add(j);
+                    }
+                }
+            }
+        }
+        moves = rows.Count;
+        return moves;
+    }
 }
