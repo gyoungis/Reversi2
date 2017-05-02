@@ -18,7 +18,9 @@ public class GameManager : MonoBehaviour {
     
     private int points;
     private int totalPoints;
-
+    private int bestRow;
+    private int bestCol;
+    private int bestPoints;
     
     private List<GameObject> affectedPieces;
     // Use this for initialization
@@ -589,6 +591,7 @@ public class GameManager : MonoBehaviour {
 
     int validMoves(int side, int opSide)
     {
+        bestPoints = 0;
         counting = true;
         int moves = 0;
         List<int> rows = new List<int>();
@@ -608,6 +611,16 @@ public class GameManager : MonoBehaviour {
                         movePoints.Add(totalPoints);                                            
                     }
                 }
+            }
+        }
+
+        // Find best move
+        for (int a = 0; a < movePoints.Count; a++)
+        {
+            if (movePoints[a] > bestPoints)
+            {
+                bestRow = rows[a];
+                bestCol = cols[a];
             }
         }
         moves = rows.Count;
