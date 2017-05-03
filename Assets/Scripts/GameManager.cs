@@ -18,11 +18,23 @@ public class GameManager : MonoBehaviour {
     
     private int points;
     private int totalPoints;
+
+    private List<GameObject> affectedPieces;
+
+    // AI variables
+    public int[,] simBoardState = new int[8, 8];
+    public int levels;
+    private int simPoints;
+    private int simTotalPoints;
+    private int simOverallPoints;
     private int bestRow;
     private int bestCol;
-    private int bestPoints;
+    private int levelBestIndex;
+    private List<int> simAffectedRows;
+    private List<int> simAffectedCols;
     
-    private List<GameObject> affectedPieces;
+    
+    
     // Use this for initialization
     void Start () {
         piece = GetComponent<GameObject>();
@@ -591,7 +603,6 @@ public class GameManager : MonoBehaviour {
 
     int validMoves(int side, int opSide)
     {
-        bestPoints = 0;
         counting = true;
         int moves = 0;
         List<int> rows = new List<int>();
@@ -614,19 +625,358 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        // Find best move
-        for (int a = 0; a < movePoints.Count; a++)
-        {
-            if (movePoints[a] > bestPoints)
-            {
-                bestRow = rows[a];
-                bestCol = cols[a];
-            }
-        }
+
         moves = rows.Count;
         rows.Clear();
         cols.Clear();
         movePoints.Clear();
         return moves;
+    }
+
+    //----------------------------------------MINI MAX--------------------------------------------------
+    bool SimCheckValidMove(int row, int col, int side, int opSide, bool counting)
+    {
+        bool valid = false;
+        simPoints = 0;
+        simTotalPoints = 0;
+        int march;
+        simAffectedRows.Clear();
+        simAffectedCols.Clear();
+
+        if (col > 1) // Check for edge
+        {
+            if (simBoardState[row, col - 1] == opSide) // Left --------------------------------------
+            {
+                for (int a = 1; a <= col; a++) // march along pieces to edge
+                {
+                    simAffectedRows.Add(row);
+                    simAffectedCols.Add(col - a);
+                    if (simBoardState[row, col - a] == side) //Same Color
+                    {
+                        simAffectedRows.Remove(row);
+                        simAffectedCols.Remove(col - a);
+                        valid = true;
+                        Debug.Log("valid: left");
+                        if (counting == false)
+                        {
+                            for (int c = 0; c < simAffectedCols.Count; c++)
+                            {
+                                // Flip affected pieces
+                                simBoardState[simAffectedRows[c], simAffectedCols[c]] = side;
+                            }
+                        }
+                        
+                        simTotalPoints += simAffectedCols.Count;
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+
+                    if (simBoardState[row, col - a] == 0) // If you don't hit your own piece again
+                    {
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (col < 6)
+        {
+            if (simBoardState[row, col + 1] == opSide) // Right --------------------------------------
+            {
+                for (int a = 1; a <= 7 - col; a++)
+                {
+                    simAffectedRows.Add(row);
+                    simAffectedCols.Add(col + a);
+                    if (simBoardState[row, col + a] == side) //Same Color
+                    {
+                        simAffectedRows.Remove(row);
+                        simAffectedCols.Remove(col + a);
+                        valid = true;
+                        if (counting == false)
+                        {
+                            for (int c = 0; c < simAffectedCols.Count; c++)
+                            {
+                                simBoardState[simAffectedRows[c], simAffectedCols[c]] = side;
+                            }
+                        }
+                        simTotalPoints += simAffectedCols.Count;
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+
+                    if (simBoardState[row, col + a] == 0)
+                    {
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (row < 6)
+        {
+            if (simBoardState[row + 1, col] == opSide) // Up --------------------------------------
+            {
+
+
+                for (int a = 1; a <= 7 - row; a++)
+                {
+                    simAffectedRows.Add(row + a);
+                    simAffectedCols.Add(col);
+                    if (simBoardState[row + a, col] == side) //Same Color
+                    {
+                        simAffectedRows.Remove(row + a);
+                        simAffectedCols.Remove(col);
+                        valid = true;
+                        if (counting == false)
+                        {
+                            for (int c = 0; c < simAffectedRows.Count; c++)
+                            {
+                                simBoardState[simAffectedRows[c], simAffectedCols[c]] = side;
+                            }
+                        }
+                        simTotalPoints += simAffectedCols.Count;
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+
+                    if (simBoardState[row + a, col] == 0)
+                    {
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (row > 1)
+        {
+            if (simBoardState[row - 1, col] == opSide) // Down --------------------------------------
+            {
+                for (int a = 1; a <= row; a++)
+                {
+                    simAffectedRows.Add(row - a);
+                    simAffectedCols.Add(col);
+                    if (simBoardState[row - a, col] == side) //Same Color
+                    {
+                        simAffectedRows.Remove(row - a);
+                        simAffectedCols.Remove(col);
+                        valid = true;
+                        if (counting == false)
+                        {
+                            for (int c = 0; c < simAffectedRows.Count; c++)
+                            {
+                                simBoardState[simAffectedRows[c], simAffectedCols[c]] = side;
+                            }
+                        }
+                        simTotalPoints += simAffectedCols.Count;
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+
+                    if (simBoardState[row - a, col] == 0)
+                    {
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (row < 6 && col > 1)
+        {
+            if (simBoardState[row + 1, col - 1] == opSide) // Top left --------------------------------------
+            {
+                march = marchLength(row, col, 0);
+                for (int a = 1; a <= march; a++)
+                {
+                    simAffectedRows.Add(row + a);
+                    simAffectedCols.Add(col - a);
+                    if (simBoardState[row + a, col - a] == side) //Same Color
+                    {
+                        simAffectedRows.Remove(row + a);
+                        simAffectedCols.Remove(col - a);
+                        valid = true;
+                        if (counting == false)
+                        {
+                            for (int c = 0; c < simAffectedRows.Count; c++)
+                            {
+                                simBoardState[simAffectedRows[c], simAffectedCols[c]] = side;
+                            }
+                        }
+                        simTotalPoints += simAffectedCols.Count;
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+
+                    if (simBoardState[row + a, col - a] == 0)
+                    {
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (row < 6 && col < 6)
+        {
+            if (simBoardState[row + 1, col + 1] == opSide) // Top Right --------------------------------------
+            {
+                march = marchLength(row, col, 1);
+                for (int a = 1; a <= march; a++)
+                {
+                    simAffectedRows.Add(row + a);
+                    simAffectedCols.Add(col + a);
+                    if (simBoardState[row + a, col + a] == side) //Same Color
+                    {
+                        simAffectedRows.Remove(row + a);
+                        simAffectedCols.Remove(col + a);
+                        valid = true;
+                        if (counting == false)
+                        {
+                            for (int c = 0; c < simAffectedRows.Count; c++)
+                            {
+                                simBoardState[simAffectedRows[c], simAffectedCols[c]] = side;
+                            }
+                        }
+                        simTotalPoints += simAffectedCols.Count;
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+
+                    if (simBoardState[row + a, col + a] == 0)
+                    {
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (row > 1 && col > 1)
+        {
+            if (simBoardState[row - 1, col - 1] == opSide) // Bottom Left --------------------------------------
+            {
+                march = marchLength(row, col, 2);
+                for (int a = 1; a <= march; a++)
+                {
+                    simAffectedRows.Add(row - a);
+                    simAffectedCols.Add(col - a);
+                    if (simBoardState[row - a, col - a] == side) //Same Color
+                    {
+                        simAffectedRows.Remove(row - a);
+                        simAffectedCols.Remove(col - a);
+                        valid = true;
+                        if (counting == false)
+                        {
+                            for (int c = 0; c < affectedPieces.Count; c++)
+                            {
+                                simBoardState[simAffectedRows[c], simAffectedCols[c]] = side;
+                            }
+                        }
+                        simTotalPoints += simAffectedCols.Count;
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+
+                    if (simBoardState[row - a, col - a] == 0)
+                    {
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (row > 1 && col < 6)
+        {
+            if (simBoardState[row - 1, col + 1] == opSide) // Bottom Right --------------------------------------
+            {
+                march = marchLength(row, col, 3);
+                for (int a = 1; a <= march; a++)
+                {
+                    simAffectedRows.Add(row - a);
+                    simAffectedCols.Add(col + a);
+                    if (simBoardState[row - a, col + a] == side) //Same Color
+                    {
+                        simAffectedRows.Remove(row - a);
+                        simAffectedCols.Remove(col + a);
+                        valid = true;
+                        if (counting == false)
+                        {
+                            for (int c = 0; c < affectedPieces.Count; c++)
+                            {
+                                simBoardState[simAffectedRows[c], simAffectedCols[c]] = side;
+                            }
+                        }
+                        simTotalPoints += simAffectedCols.Count;
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+
+                    if (simBoardState[row - a, col + a] == 0)
+                    {
+                        simAffectedRows.Clear();
+                        simAffectedCols.Clear();
+                        break;
+                    }
+                }
+            }
+        }
+
+        return valid;
+    }
+
+    int SimValidMoves(int side, int opSide)
+    {
+        counting = true;
+        int moves = 0;
+        List<int> rows = new List<int>();
+        List<int> cols = new List<int>();
+        List<int> movePoints = new List<int>();
+        movePoints.Clear();
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (simBoardState[i, j] == 0)
+                {
+                    if (SimCheckValidMove(i, j, side, opSide, counting) == true)
+                    {
+                        rows.Add(i);
+                        cols.Add(j);
+                        movePoints.Add(simTotalPoints);
+                    }
+                }
+            }
+        }
+
+
+        moves = rows.Count;
+        rows.Clear();
+        cols.Clear();
+        movePoints.Clear();
+        return moves;
+    }
+
+    void AIMove()
+    {
+        simBoardState = boardState;
     }
 }
