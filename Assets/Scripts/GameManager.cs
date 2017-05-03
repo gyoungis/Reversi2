@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
@@ -32,6 +33,15 @@ public class GameManager : MonoBehaviour {
     private int levelBestIndex;
     private List<int> simAffectedRows;
     private List<int> simAffectedCols;
+    private List<int> currentRows;
+    private List<int> currentCols;
+    private List<int> currentPoints;
+    private List<int> simRowMoves;
+    private List<int> simColMoves;
+    private List<int> simMovePoints;
+
+    private float timer = 0.0f;
+    public float delay = 3.0f;
     
     
     
@@ -78,7 +88,7 @@ public class GameManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButtonDown("Fire1") && playerSide ==1)
         {
             float i;
             float j;
@@ -170,6 +180,34 @@ public class GameManager : MonoBehaviour {
                     }
 
                 }
+            }
+        }
+
+
+        if (playerSide == 2)
+        {
+            timer += Time.deltaTime;
+            if (timer > delay)
+            {
+                Vector3 Insert;
+                AIMove();
+                checkValidMove(bestRow, bestCol, playerSide, oppositeSide, false);
+
+                Insert = new Vector3(bestCol + 0.5f, 10, bestRow + 0.5f);
+                boardState[bestRow, bestCol] = playerSide;
+                pieceArray[bestRow, bestCol].transform.position = Insert;
+                pieceArray[bestRow, bestCol].GetComponent<Rigidbody>().useGravity = true;
+                oppositeScore += 1;
+                playerSide = 1;
+                oppositeSide = 2;
+
+                if (validMoves(1, 2) == 0)
+                {
+                    playerSide = 2;
+                    oppositeSide = 1;
+                }
+
+                timer = 0f;
             }
         }
 
@@ -636,6 +674,8 @@ public class GameManager : MonoBehaviour {
     //----------------------------------------MINI MAX--------------------------------------------------
     bool SimCheckValidMove(int row, int col, int side, int opSide, bool counting)
     {
+        simAffectedRows = new List<int>();
+        simAffectedCols = new List<int>();
         bool valid = false;
         simPoints = 0;
         simTotalPoints = 0;
@@ -661,7 +701,7 @@ public class GameManager : MonoBehaviour {
                         {
                             for (int c = 0; c < simAffectedCols.Count; c++)
                             {
-                                // Flip affected pieces
+                                // Flip affected pieces when not counting all possible
                                 simBoardState[simAffectedRows[c], simAffectedCols[c]] = side;
                             }
                         }
@@ -943,40 +983,116 @@ public class GameManager : MonoBehaviour {
         return valid;
     }
 
-    int SimValidMoves(int side, int opSide)
+    void SimValidMoves(int side, int opSide, int level, int index)
     {
-        counting = true;
-        int moves = 0;
-        List<int> rows = new List<int>();
-        List<int> cols = new List<int>();
-        List<int> movePoints = new List<int>();
-        movePoints.Clear();
+        
+        simRowMoves.Clear();
+        simColMoves.Clear();
+        simMovePoints.Clear();
+        int addedValue;
+        int arrayIndex;
+        // Find all possible moves in simulated board
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
                 if (simBoardState[i, j] == 0)
                 {
-                    if (SimCheckValidMove(i, j, side, opSide, counting) == true)
+                    if (SimCheckValidMove(i, j, side, opSide, true) == true)
                     {
-                        rows.Add(i);
-                        cols.Add(j);
-                        movePoints.Add(simTotalPoints);
+                        simRowMoves.Add(i);
+                        simColMoves.Add(j);
+                        simMovePoints.Add(simTotalPoints);
+                    }
+                }
+            }
+        }
+
+        if (level%2 != 0) // AI turn
+        {
+            // Get max points for AI turn
+            addedValue = simMovePoints.Max();
+            arrayIndex = simMovePoints.ToList().IndexOf(addedValue);
+            currentPoints[index] += addedValue;
+            bestRow = simRowMoves[arrayIndex];
+            bestCol = simColMoves[arrayIndex];
+        }
+        else // Sim Player Move
+        {
+            // Get min points for sim Player
+            addedValue = simMovePoints.Min();
+            arrayIndex = simMovePoints.ToList().IndexOf(addedValue);
+            currentPoints[index] -= addedValue;
+            bestRow = simRowMoves[arrayIndex];
+            bestCol = simColMoves[arrayIndex];
+        }
+
+
+
+    }
+
+    void AIMove()
+    {
+        currentRows = new List<int>();
+        currentCols = new List<int>();
+        currentPoints = new List<int>();
+        simRowMoves = new List<int>();
+        simColMoves = new List<int>();
+        simMovePoints = new List<int>();
+        int side = 2;
+        int opSide = 1;
+        simBoardState = boardState;
+        for (int i = 0; i < 8; i++) // Get possible moves
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (simBoardState[i, j] == 0)
+                {
+                    if (SimCheckValidMove(i, j, side, opSide, true) == true)
+                    {
+                        currentRows.Add(i); // Don't Change
+                        currentCols.Add(j); // Don't Change
+                        currentPoints.Add(simTotalPoints);
+                        simRowMoves.Add(i);
+                        simColMoves.Add(j);
+                        
                     }
                 }
             }
         }
 
 
-        moves = rows.Count;
-        rows.Clear();
-        cols.Clear();
-        movePoints.Clear();
-        return moves;
+        for (int a = 0; a < currentCols.Count; a++) // For each current move
+        {
+            bestRow = currentRows[a];
+            bestCol = currentCols[a];
+            for (int l = 1; l <= levels; l++)
+            {
+                if (levels % 2 == 0)
+                {
+                    side = 1; // Even levels is sim Player
+                    opSide = 2;
+                }
+                else
+                {
+                    side = 2; // Odd is AI
+                    opSide = 1;
+                }
+                SimCheckValidMove(bestRow, bestCol, side, opSide, false);
+                SimValidMoves(side, opSide, l, a);
+            }
+        }
+        if (currentPoints != null)
+        {
+            simOverallPoints = currentPoints.Max();
+            levelBestIndex = currentPoints.ToList().IndexOf(simOverallPoints);
+            bestRow = currentRows[levelBestIndex];
+            bestCol = currentCols[levelBestIndex];
+        }
     }
 
-    void AIMove()
+    IEnumerator Wait()
     {
-        simBoardState = boardState;
+        yield return new WaitForSecondsRealtime(3);
     }
 }
