@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour {
     public int playerSide = 1;
     private int oppositeSide = 2;
 
-    private bool counting;
+    //private bool counting;
     
     private int points;
     private int totalPoints;
@@ -113,9 +113,9 @@ public class GameManager : MonoBehaviour {
                 {
                     if (playerSide == 1)
                     {
-                        bool counting = false;
+                        
                         insertPoint = new Vector3(i+0.5f, 10, j+0.5f);
-                        if (checkValidMove(row, col, playerSide, oppositeSide, counting))
+                        if (checkValidMove(row, col, playerSide, oppositeSide, false))
                         {
                             boardState[row, col] = playerSide;
                             pieceArray[row, col].transform.position = insertPoint;
@@ -147,8 +147,8 @@ public class GameManager : MonoBehaviour {
                     }
                     else
                     {
-                        counting = false;
-                        if (checkValidMove(row, col, playerSide, oppositeSide, counting))
+                        
+                        if (checkValidMove(row, col, playerSide, oppositeSide, false))
                         {
                             insertPoint = new Vector3(i + 0.5f, 10, j + 0.5f);
                             boardState[row, col] = playerSide;
@@ -191,16 +191,17 @@ public class GameManager : MonoBehaviour {
             {
                 Vector3 Insert;
                 AIMove();
-                checkValidMove(bestRow, bestCol, playerSide, oppositeSide, false);
 
-                Insert = new Vector3(bestCol + 0.5f, 10, bestRow + 0.5f);
-                boardState[bestRow, bestCol] = playerSide;
-                pieceArray[bestRow, bestCol].transform.position = Insert;
-                pieceArray[bestRow, bestCol].GetComponent<Rigidbody>().useGravity = true;
-                oppositeScore += 1;
-                playerSide = 1;
-                oppositeSide = 2;
-
+                if (checkValidMove(bestRow, bestCol, playerSide, oppositeSide, false))
+                {
+                    Insert = new Vector3(bestCol + 0.5f, 10, bestRow + 0.5f);
+                    boardState[bestRow, bestCol] = playerSide;
+                    pieceArray[bestRow, bestCol].transform.position = Insert;
+                    pieceArray[bestRow, bestCol].GetComponent<Rigidbody>().useGravity = true;
+                    oppositeScore += 1;
+                    playerSide = 1;
+                    oppositeSide = 2;
+                }
                 if (validMoves(1, 2) == 0)
                 {
                     playerSide = 2;
@@ -641,7 +642,7 @@ public class GameManager : MonoBehaviour {
 
     int validMoves(int side, int opSide)
     {
-        counting = true;
+        
         int moves = 0;
         List<int> rows = new List<int>();
         List<int> cols = new List<int>();
@@ -653,7 +654,7 @@ public class GameManager : MonoBehaviour {
             {
                 if (boardState[i, j] == 0)
                 {
-                    if (checkValidMove(i, j, side, opSide, counting) == true)
+                    if (checkValidMove(i, j, side, opSide, true) == true)
                     {
                         rows.Add(i);
                         cols.Add(j);
@@ -986,9 +987,9 @@ public class GameManager : MonoBehaviour {
     void SimValidMoves(int side, int opSide, int level, int index)
     {
         
-        simRowMoves.Clear();
-        simColMoves.Clear();
-        simMovePoints.Clear();
+        //simRowMoves.Clear();
+        //simColMoves.Clear();
+        //simMovePoints.Clear();
         int addedValue;
         int arrayIndex;
         // Find all possible moves in simulated board
@@ -1080,6 +1081,9 @@ public class GameManager : MonoBehaviour {
                 }
                 SimCheckValidMove(bestRow, bestCol, side, opSide, false);
                 SimValidMoves(side, opSide, l, a);
+                simRowMoves.Clear();
+                simColMoves.Clear();
+                simMovePoints.Clear();
             }
         }
         if (currentPoints != null)

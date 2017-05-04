@@ -36,6 +36,13 @@ public class MenuScript : MonoBehaviour {
         Hardest.GetComponent<Text>().enabled = false;
         Harder.GetComponent<Text>().enabled = false;
         Hard.GetComponent<Text>().enabled = false;
+
+        Easiest.GetComponent<Button>().interactable = false;
+        Easier.GetComponent<Button>().interactable = false;
+        Easy.GetComponent<Button>().interactable = false;
+        Hardest.GetComponent<Button>().interactable = false;
+        Harder.GetComponent<Button>().interactable = false;
+        Hard.GetComponent<Button>().interactable = false;
     }
 	
 	public void EasiestPress()
