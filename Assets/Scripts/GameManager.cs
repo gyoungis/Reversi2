@@ -91,7 +91,11 @@ public class GameManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        
+        if (Input.GetKey("escape"))
+        {
+            Application.Quit();
+        }
+
         if (!started)
         {
             if (difficulty == 3)
@@ -271,20 +275,9 @@ public class GameManager : MonoBehaviour {
                             for (int c = 0; c < affectedPieces.Count; c++)
                             {
                                 // Flip affected pieces
-                                
-                                Vector3 pos = affectedPieces[c].transform.position;
-                                //affectedPieces[c].transform.Rotate(0, 0, 180);
-                                if (side == 1)
-                                {
-                                    affectedPieces[c].transform.position = pos;
-                                    affectedPieces[c].GetComponent<Animation>().Play("Blk2Wht");
-                                    
-                                    
-                                }
-                                else
-                                {
-                                    affectedPieces[c].GetComponent<Animation>().Play("Wht2Blk");
-                                }
+
+                                affectedPieces[c].transform.localPosition = affectedPieces[c].transform.localPosition + new Vector3(0, 2, 0);
+                                affectedPieces[c].transform.Rotate(0, 0, 180);
                                 boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                             }
                         }
@@ -327,6 +320,7 @@ public class GameManager : MonoBehaviour {
                         {
                             for (int c = 0; c < affectedPieces.Count; c++)
                             {
+                                affectedPieces[c].transform.localPosition = affectedPieces[c].transform.localPosition + new Vector3(0, 2, 0);
                                 affectedPieces[c].transform.Rotate(0, 0, 180);
                                 boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                             }
@@ -368,6 +362,7 @@ public class GameManager : MonoBehaviour {
                         {
                             for (int c = 0; c < affectedPieces.Count; c++)
                             {
+                                affectedPieces[c].transform.localPosition = affectedPieces[c].transform.localPosition + new Vector3(0, 2, 0);
                                 affectedPieces[c].transform.Rotate(0, 0, 180);
                                 boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                             }
@@ -412,6 +407,7 @@ public class GameManager : MonoBehaviour {
                         {
                             for (int c = 0; c < affectedPieces.Count; c++)
                             {
+                                affectedPieces[c].transform.localPosition = affectedPieces[c].transform.localPosition + new Vector3(0, 2, 0);
                                 affectedPieces[c].transform.Rotate(0, 0, 180);
                                 boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                             }
@@ -453,6 +449,7 @@ public class GameManager : MonoBehaviour {
                         {
                             for (int c = 0; c < affectedPieces.Count; c++)
                             {
+                                affectedPieces[c].transform.localPosition = affectedPieces[c].transform.localPosition + new Vector3(0, 2, 0);
                                 affectedPieces[c].transform.Rotate(0, 0, 180);
                                 boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                             }
@@ -494,6 +491,7 @@ public class GameManager : MonoBehaviour {
                         {
                             for (int c = 0; c < affectedPieces.Count; c++)
                             {
+                                affectedPieces[c].transform.localPosition = affectedPieces[c].transform.localPosition + new Vector3(0, 2, 0);
                                 affectedPieces[c].transform.Rotate(0, 0, 180);
                                 boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                             }
@@ -535,6 +533,7 @@ public class GameManager : MonoBehaviour {
                         {
                             for (int c = 0; c < affectedPieces.Count; c++)
                             {
+                                affectedPieces[c].transform.localPosition = affectedPieces[c].transform.localPosition + new Vector3(0, 2, 0);
                                 affectedPieces[c].transform.Rotate(0, 0, 180);
                                 boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                             }
@@ -578,6 +577,7 @@ public class GameManager : MonoBehaviour {
                         {
                             for (int c = 0; c < affectedPieces.Count; c++)
                             {
+                                affectedPieces[c].transform.localPosition = affectedPieces[c].transform.localPosition + new Vector3(0, 2, 0);
                                 affectedPieces[c].transform.Rotate(0, 0, 180);
                                 boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                             }
