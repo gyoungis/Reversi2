@@ -13,6 +13,7 @@ public class MenuScript : MonoBehaviour {
     public Button Harder;
     public Button Hardest;
     public Text title;
+    public int level;
     private GameManager gameMan;
 	// Use this for initialization
 	void Start () {
@@ -49,41 +50,48 @@ public class MenuScript : MonoBehaviour {
     {
         DisableText();
         mainCamera.transform.position = new Vector3(4, 10, 4);
-        gameMan.levels = 3;
+        gameMan.difficulty = 3;
+        gameMan.started = true;
+
     }
 
     public void EasierPress()
     {
         DisableText();
         mainCamera.transform.position = new Vector3(4, 10, 4);
-        gameMan.levels = 4;
+        gameMan.difficulty = 4;
+        gameMan.started = true;
     }
 
     public void EasyPress()
     {
         DisableText();
         mainCamera.transform.position = new Vector3(4, 10, 4);
-        gameMan.levels = 5;
+        gameMan.difficulty = 5;
+        gameMan.started = true;
     }
 
     public void HardPress()
     {
         DisableText();
         mainCamera.transform.position = new Vector3(4, 10, 4);
-        gameMan.levels = 6;
+        gameMan.difficulty = 6;
+        gameMan.started = true;
     }
 
     public void HarderPress()
     {
         DisableText();
         mainCamera.transform.position = new Vector3(4, 10, 4);
-        gameMan.levels = 7;
+        gameMan.difficulty = 7;
+        gameMan.started = true;
     }
 
     public void HardestPress()
     {
         DisableText();
         mainCamera.transform.position = new Vector3(4, 10, 4);
-        gameMan.levels = 8;
+        gameMan.difficulty = 8;
+        gameMan.started = true;
     }
 }

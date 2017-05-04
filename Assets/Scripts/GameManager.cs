@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour {
 
     // AI variables
     public int[,] simBoardState = new int[8, 8];
-    public int levels;
+    public int levels = 4;
     private int simPoints;
     private int simTotalPoints;
     private int simOverallPoints;
@@ -42,9 +42,10 @@ public class GameManager : MonoBehaviour {
 
     private float timer = 0.0f;
     public float delay = 3.0f;
-    
-    
-    
+
+    public bool started = false;
+    public int difficulty = 0;
+    private MenuScript menu;
     // Use this for initialization
     void Start () {
         piece = GetComponent<GameObject>();
@@ -84,15 +85,47 @@ public class GameManager : MonoBehaviour {
         pieceArray[4, 3].transform.Rotate(180, 0, 0);
         pieceArray[4, 3].GetComponent<Rigidbody>().useGravity = true;
 
+        GameObject startMenu = GameObject.Find("StartMenu");
+        menu = startMenu.GetComponent<MenuScript>();
     }
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetButtonDown("Fire1") && playerSide ==1)
+        
+        if (!started)
+        {
+            if (difficulty == 3)
+            {
+                levels = 3;
+            }
+            if (difficulty == 4)
+            {
+                levels = 4;
+            }
+            if (difficulty == 5)
+            {
+                levels = 5;
+            }
+            if (difficulty == 6)
+            {
+                levels = 6;
+            }
+            if (difficulty == 7)
+            {
+                levels = 7;
+            }
+            if (difficulty == 7)
+            {
+                levels = 7;
+            }
+        }
+
+        //Debug.Log("level: " + levels);
+        if (Input.GetButtonDown("Fire1") && playerSide == 1)
         {
             float i;
             float j;
-            
+
             int row;
             int col;
             Vector3 insertPoint;
@@ -113,8 +146,8 @@ public class GameManager : MonoBehaviour {
                 {
                     if (playerSide == 1)
                     {
-                        
-                        insertPoint = new Vector3(i+0.5f, 10, j+0.5f);
+
+                        insertPoint = new Vector3(i + 0.5f, 10, j + 0.5f);
                         if (checkValidMove(row, col, playerSide, oppositeSide, false))
                         {
                             boardState[row, col] = playerSide;
@@ -147,7 +180,7 @@ public class GameManager : MonoBehaviour {
                     }
                     else
                     {
-                        
+
                         if (checkValidMove(row, col, playerSide, oppositeSide, false))
                         {
                             insertPoint = new Vector3(i + 0.5f, 10, j + 0.5f);
@@ -238,8 +271,20 @@ public class GameManager : MonoBehaviour {
                             for (int c = 0; c < affectedPieces.Count; c++)
                             {
                                 // Flip affected pieces
-
-                                affectedPieces[c].transform.Rotate(0, 0, 180);
+                                
+                                Vector3 pos = affectedPieces[c].transform.position;
+                                //affectedPieces[c].transform.Rotate(0, 0, 180);
+                                if (side == 1)
+                                {
+                                    affectedPieces[c].transform.position = pos;
+                                    affectedPieces[c].GetComponent<Animation>().Play("Blk2Wht");
+                                    
+                                    
+                                }
+                                else
+                                {
+                                    affectedPieces[c].GetComponent<Animation>().Play("Wht2Blk");
+                                }
                                 boardState[(int)affectedPieces[c].transform.position.z, (int)affectedPieces[c].transform.position.x] = side;
                             }
                         }
@@ -1008,26 +1053,32 @@ public class GameManager : MonoBehaviour {
                 }
             }
         }
-
+        Debug.Log("Max Points: " + simMovePoints.Count);
         if (level%2 != 0) // AI turn
         {
             // Get max points for AI turn
-            addedValue = simMovePoints.Max();
-            arrayIndex = simMovePoints.ToList().IndexOf(addedValue);
-            currentPoints[index] += addedValue;
-            bestRow = simRowMoves[arrayIndex];
-            bestCol = simColMoves[arrayIndex];
+            if (simMovePoints != null)
+            {
+                addedValue = simMovePoints.Max();
+                arrayIndex = simMovePoints.ToList().IndexOf(addedValue);
+                currentPoints[index] += addedValue;
+                bestRow = simRowMoves[arrayIndex];
+                bestCol = simColMoves[arrayIndex];
+            }
         }
         else // Sim Player Move
         {
-            // Get min points for sim Player
-            addedValue = simMovePoints.Min();
-            arrayIndex = simMovePoints.ToList().IndexOf(addedValue);
-            currentPoints[index] -= addedValue;
-            bestRow = simRowMoves[arrayIndex];
-            bestCol = simColMoves[arrayIndex];
+            if (simMovePoints != null)
+            {
+                // Get min points for sim Player
+                addedValue = simMovePoints.Min();
+                arrayIndex = simMovePoints.ToList().IndexOf(addedValue);
+                currentPoints[index] -= addedValue;
+                bestRow = simRowMoves[arrayIndex];
+                bestCol = simColMoves[arrayIndex];
+            }
         }
-
+        
 
 
     }
@@ -1086,6 +1137,7 @@ public class GameManager : MonoBehaviour {
                 simMovePoints.Clear();
             }
         }
+        Debug.Log("current: " + currentPoints.Count);
         if (currentPoints != null)
         {
             simOverallPoints = currentPoints.Max();
